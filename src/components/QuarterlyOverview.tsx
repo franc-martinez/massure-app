@@ -73,7 +73,11 @@ export function QuarterlyOverview() {
                 />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="value" name="name" fill={QUARTER_COLORS[selectedQuarter]} />
+                <Bar
+                  dataKey="value"
+                  name="name"
+                  fill={QUARTER_COLORS[selectedQuarter]}
+                />
               </BarChart>
             </ResponsiveContainer>
 
@@ -124,6 +128,16 @@ export function QuarterlyOverview() {
                   <TableCell>kg CO2</TableCell>
                 </TableRow>
               ))}
+              <TableRow>
+                <TableCell>Total</TableCell>
+                <TableCell>
+                  {Math.round(
+                    emissionsData.reduce((sum, item) => sum + item.value, 0) *
+                      1000
+                  ) / 1000}
+                </TableCell>
+                <TableCell>kg CO2</TableCell>
+              </TableRow>
             </TableBody>
           </Table>
         </CardContent>

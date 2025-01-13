@@ -2,8 +2,8 @@ import React, { createContext, useContext, useReducer, ReactNode } from 'react';
 
 export interface CommutingData {
   [quarter: string]: {
-    publicTransport: number;
-    cycling: number;
+    publicTransportMix: number;
+    cyclingAndWorking: number;
     passengerCar: number;
     gasolineCar: number;
     dieselCar: number;
@@ -24,8 +24,8 @@ interface CommutingState {
 const initialState: CommutingState = {
   data: {
     Q1: {
-      publicTransport: 2111,
-      cycling: 2000,
+      publicTransportMix: 2111,
+      cyclingAndWorking: 2000,
       passengerCar: 1000,
       gasolineCar: 650,
       dieselCar: 52,
@@ -34,8 +34,8 @@ const initialState: CommutingState = {
       airplaneEurope: 2000
     },
     Q2: {
-      publicTransport: 4000,
-      cycling: 3500,
+      publicTransportMix: 4000,
+      cyclingAndWorking: 3500,
       passengerCar: 1500,
       gasolineCar: 500,
       dieselCar: 400,
@@ -44,8 +44,8 @@ const initialState: CommutingState = {
       airplaneEurope: 1500
     },
     Q3: {
-      publicTransport: 3500,
-      cycling: 2500,
+      publicTransportMix: 3500,
+      cyclingAndWorking: 2500,
       passengerCar: 1899,
       gasolineCar: 600,
       dieselCar: 500,
@@ -54,8 +54,8 @@ const initialState: CommutingState = {
       airplaneEurope: 1700
     },
     Q4: {
-      publicTransport: 2500,
-      cycling: 1000,
+      publicTransportMix: 2500,
+      cyclingAndWorking: 1000,
       passengerCar: 1556,
       gasolineCar: 670,
       dieselCar: 515,

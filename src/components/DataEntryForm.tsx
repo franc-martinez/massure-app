@@ -17,8 +17,8 @@ import { useEffect } from "react";
 import { QuarterSelector } from "./QuarterSelector";
 
 const formSchema = z.object({
-  publicTransport: z.number().min(1),
-  cycling: z.number().min(1),
+  publicTransportMix: z.number().min(1),
+  cyclingAndWorking: z.number().min(1),
   passengerCar: z.number().min(1),
   gasolineCar: z.number().min(1),
   dieselCar: z.number().min(1),
@@ -36,8 +36,8 @@ export function DataEntryForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      publicTransport: 0,
-      cycling: 0,
+      publicTransportMix: 0,
+      cyclingAndWorking: 0,
       passengerCar: 0,
       gasolineCar: 0,
       dieselCar: 0,

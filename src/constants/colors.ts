@@ -1,6 +1,6 @@
 export const TRANSPORT_COLORS = {
-  publicTransport: "#156082",
-  cycling: "#e97132",
+  publicTransportMix: "#156082",
+  cyclingAndWorking: "#e97132",
   passengerCar: "#196b24",
   gasolineCar: "#0f9ed5",
   dieselCar: "#a02b93",

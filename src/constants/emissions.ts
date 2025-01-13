@@ -1,9 +1,9 @@
 export const EMISSION_FACTORS = {
-  publicTransport: {
+  publicTransportMix: {
     value: 0.02,
     unit: 'kg CO₂/person km'
   },
-  cycling: {
+  cyclingAndWorking: {
     value: 0,
     unit: 'kg CO₂/km'
   },

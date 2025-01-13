@@ -110,29 +110,6 @@ export function AnnualOverview() {
     <div className="grid grid-cols-2 gap-6">
       <Card>
         <CardHeader>
-          <CardTitle>Quarterly Comparison by Transport Mode</CardTitle>
-          <CardDescription>
-            Direct comparison of emissions across quarters
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={400}>
-            <BarChart data={comparisonData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="category" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              {Object.entries(QUARTER_COLORS).map(([quarter, color]) => (
-                <Bar key={quarter} dataKey={quarter} fill={color} name={quarter} />
-              ))}
-            </BarChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
           <CardTitle>Transport Mode Distribution by Quarter</CardTitle>
           <CardDescription>
             Percentage distribution of CO2 emissions
@@ -188,6 +165,29 @@ export function AnnualOverview() {
                 />
               ))}
             </AreaChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Quarterly Comparison by Transport Mode</CardTitle>
+          <CardDescription>
+            Direct comparison of emissions across quarters
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ResponsiveContainer width="100%" height={400}>
+            <BarChart data={comparisonData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="category" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              {Object.entries(QUARTER_COLORS).map(([quarter, color]) => (
+                <Bar key={quarter} dataKey={quarter} fill={color} name={quarter} />
+              ))}
+            </BarChart>
           </ResponsiveContainer>
         </CardContent>
       </Card>
