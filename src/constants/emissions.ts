@@ -1,35 +1,43 @@
 export const EMISSION_FACTORS = {
   publicTransportMix: {
     value: 0.02,
-    unit: 'kg CO₂/person km'
+    unit: 'kg CO₂/person km',
+    description: 'Public transportation including buses and trains'
   },
   cyclingAndWorking: {
     value: 0,
-    unit: 'kg CO₂/km'
+    unit: 'kg CO₂/km',
+    description: 'Cycling and walking activities'
   },
   passengerCar: {
     value: 0.193,
-    unit: 'kg CO₂/km'
+    unit: 'kg CO₂/km',
+    description: 'Regular passenger vehicles'
   },
   gasolineCar: {
     value: 0.204,
-    unit: 'kg CO₂/km'
+    unit: 'kg CO₂/km',
+    description: 'Gasoline-powered vehicles'
   },
   dieselCar: {
     value: 0.18,
-    unit: 'kg CO₂/km'
+    unit: 'kg CO₂/km',
+    description: 'Diesel-powered vehicles'
   },
   hybridCar: {
     value: 0.137,
-    unit: 'kg CO₂/km'
+    unit: 'kg CO₂/km',
+    description: 'Hybrid electric vehicles'
   },
   electricCar: {
     value: 0.069,
-    unit: 'kg CO₂/km'
+    unit: 'kg CO₂/km',
+    description: 'Fully electric vehicles'
   },
   airplaneEurope: {
     value: 0.022,
-    unit: 'kg CO₂/km'
+    unit: 'kg CO₂/km',
+    description: 'European air travel'
   }
 };
 

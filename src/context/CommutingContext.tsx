@@ -1,106 +1,398 @@
-import React, { createContext, useContext, useReducer, ReactNode } from 'react';
+import React, { createContext, useContext, useReducer, ReactNode } from "react";
 
-export interface CommutingData {
-  [quarter: string]: {
-    publicTransportMix: number;
-    cyclingAndWorking: number;
-    passengerCar: number;
-    gasolineCar: number;
-    dieselCar: number;
-    hybridCar: number;
-    electricCar: number;
-    airplaneEurope: number;
-  };
+type DataStatus = "draft" | "pending" | "approved" | "finalized";
+
+export interface EntryData {
+  value: number;
+  status: DataStatus;
+  approvedBy?: string;
+  approvedAt?: Date;
+  lastModified: Date;
 }
 
-export type Quarter = 'Q1' | 'Q2' | 'Q3' | 'Q4';
+export interface QuarterData {
+  [mode: string]: EntryData;
+}
+
+export interface YearData {
+  [quarter: string]: QuarterData;
+}
+
+interface CommutingData {
+  [year: string]: YearData;
+}
 
 interface CommutingState {
   data: CommutingData;
-  selectedQuarter: Quarter;
+  selectedYear: string;
+  selectedQuarter: string;
+  companyName: string;
+  descriptions: {
+    [key: string]: string;
+  };
 }
 
-// Define the initial state
+type Action =
+  | {
+      type: "UPDATE_DATA";
+      payload: {
+        year: string;
+        quarter: string;
+        mode: string;
+        value: number;
+        status: DataStatus;
+      };
+    }
+  | {
+      type: "APPROVE_DATA";
+      payload: {
+        year: string;
+        quarter: string;
+        mode: string;
+        approvedBy: string;
+      };
+    }
+  | {
+      type: "REJECT_DATA";
+      payload: {
+        year: string;
+        quarter: string;
+        mode: string;
+        approvedBy: string;
+      };
+    }
+  | { type: "FINALIZE_DATA"; payload: { year: string; quarter: string } }
+  | { type: "SET_SELECTED_YEAR"; payload: string }
+  | { type: "SET_SELECTED_QUARTER"; payload: string }
+  | { type: "SET_COMPANY_NAME"; payload: string }
+  | {
+      type: "UPDATE_DESCRIPTION";
+      payload: { mode: string; description: string };
+    };
+
+const currentYear = new Date().getFullYear().toString();
+
 const initialState: CommutingState = {
   data: {
-    Q1: {
-      publicTransportMix: 2111,
-      cyclingAndWorking: 2000,
-      passengerCar: 1000,
-      gasolineCar: 650,
-      dieselCar: 52,
-      hybridCar: 45,
-      electricCar: 122,
-      airplaneEurope: 2000
+    2024: {
+      Q1: {
+        publicTransportMix: {
+          value: 2111,
+          status: "approved",
+          lastModified: new Date(),
+        },
+        cyclingAndWorking: {
+          value: 2000,
+          status: "approved",
+          lastModified: new Date(),
+        },
+        passengerCar: {
+          value: 1000,
+          status: "approved",
+          lastModified: new Date(),
+        },
+        gasolineCar: {
+          value: 650,
+          status: "approved",
+          lastModified: new Date(),
+        },
+        dieselCar: {
+          value: 52,
+          status: "approved",
+          lastModified: new Date(),
+        },
+        hybridCar: {
+          value: 45,
+          status: "approved",
+          lastModified: new Date(),
+        },
+        electricCar: {
+          value: 122,
+          status: "approved",
+          lastModified: new Date(),
+        },
+        airplaneEurope: {
+          value: 2000,
+          status: "approved",
+          lastModified: new Date(),
+        },
+      },
+      Q2: {
+        publicTransportMix: {
+          value: 4000,
+          status: "approved",
+          lastModified: new Date(),
+        },
+        cyclingAndWorking: {
+          value: 3500,
+          status: "approved",
+          lastModified: new Date(),
+        },
+        passengerCar: {
+          value: 1500,
+          status: "approved",
+          lastModified: new Date(),
+        },
+        gasolineCar: {
+          value: 500,
+          status: "approved",
+          lastModified: new Date(),
+        },
+        dieselCar: {
+          value: 400,
+          status: "approved",
+          lastModified: new Date(),
+        },
+        hybridCar: {
+          value: 200,
+          status: "approved",
+          lastModified: new Date(),
+        },
+        electricCar: {
+          value: 535,
+          status: "approved",
+          lastModified: new Date(),
+        },
+        airplaneEurope: {
+          value: 1500,
+          status: "approved",
+          lastModified: new Date(),
+        },
+      },
+      Q3: {
+        publicTransportMix: {
+          value: 3500,
+          status: "approved",
+          lastModified: new Date(),
+        },
+        cyclingAndWorking: {
+          value: 2500,
+          status: "approved",
+          lastModified: new Date(),
+        },
+        passengerCar: {
+          value: 1899,
+          status: "approved",
+          lastModified: new Date(),
+        },
+        gasolineCar: {
+          value: 600,
+          status: "approved",
+          lastModified: new Date(),
+        },
+        dieselCar: {
+          value: 500,
+          status: "approved",
+          lastModified: new Date(),
+        },
+        hybridCar: {
+          value: 650,
+          status: "approved",
+          lastModified: new Date(),
+        },
+        electricCar: {
+          value: 555,
+          status: "approved",
+          lastModified: new Date(),
+        },
+        airplaneEurope: {
+          value: 1700,
+          status: "approved",
+          lastModified: new Date(),
+        },
+      },
+      Q4: {
+        publicTransportMix: {
+          value: 2500,
+          status: "approved",
+          lastModified: new Date(),
+        },
+        cyclingAndWorking: {
+          value: 1000,
+          status: "approved",
+          lastModified: new Date(),
+        },
+        passengerCar: {
+          value: 1556,
+          status: "approved",
+          lastModified: new Date(),
+        },
+        gasolineCar: {
+          value: 670,
+          status: "approved",
+          lastModified: new Date(),
+        },
+        dieselCar: {
+          value: 515,
+          status: "approved",
+          lastModified: new Date(),
+        },
+        hybridCar: {
+          value: 789,
+          status: "approved",
+          lastModified: new Date(),
+        },
+        electricCar: {
+          value: 650,
+          status: "approved",
+          lastModified: new Date(),
+        },
+        airplaneEurope: {
+          value: 2100,
+          status: "approved",
+          lastModified: new Date(),
+        },
+      },
     },
-    Q2: {
-      publicTransportMix: 4000,
-      cyclingAndWorking: 3500,
-      passengerCar: 1500,
-      gasolineCar: 500,
-      dieselCar: 400,
-      hybridCar: 200,
-      electricCar: 535,
-      airplaneEurope: 1500
-    },
-    Q3: {
-      publicTransportMix: 3500,
-      cyclingAndWorking: 2500,
-      passengerCar: 1899,
-      gasolineCar: 600,
-      dieselCar: 500,
-      hybridCar: 650,
-      electricCar: 555,
-      airplaneEurope: 1700
-    },
-    Q4: {
-      publicTransportMix: 2500,
-      cyclingAndWorking: 1000,
-      passengerCar: 1556,
-      gasolineCar: 670,
-      dieselCar: 515,
-      hybridCar: 789,
-      electricCar: 650,
-      airplaneEurope: 2100
-    }
   },
-  selectedQuarter: 'Q1'
+  selectedYear: currentYear,
+  selectedQuarter: "Q1",
+  companyName: "TrackJack Europe B.V.",
+  descriptions: {
+    publicTransport: "Public transportation including buses and trains",
+    cycling: "Cycling and walking activities",
+    passengerCar: "Regular passenger vehicles",
+    gasolineCar: "Gasoline-powered vehicles",
+    dieselCar: "Diesel-powered vehicles",
+    hybridCar: "Hybrid electric vehicles",
+    electricCar: "Fully electric vehicles",
+    airplaneEurope: "European air travel",
+  },
 };
 
-type Action =
-  | { type: 'UPDATE_DATA'; payload: { quarter: string; data: Partial<CommutingData[string]> } }
-  | { type: 'RESET_DATA' }
-  | { type: 'SET_SELECTED_QUARTER'; payload: Quarter };
-
-function commutingReducer(state: CommutingState, action: Action): CommutingState {
+function commutingReducer(
+  state: CommutingState,
+  action: Action
+): CommutingState {
   switch (action.type) {
-    case 'UPDATE_DATA':
+    case "UPDATE_DATA":
       return {
         ...state,
         data: {
           ...state.data,
-          [action.payload.quarter]: {
-            ...state.data[action.payload.quarter],
-            ...action.payload.data,
-          }
-        }
+          [action.payload.year]: {
+            ...state.data[action.payload.year],
+            [action.payload.quarter]: {
+              ...state.data[action.payload.year]?.[action.payload.quarter],
+              [action.payload.mode]: {
+                value: action.payload.value,
+                status: action.payload.status,
+                lastModified: new Date(),
+              },
+            },
+          },
+        },
       };
-    case 'RESET_DATA':
-      return initialState;
-    case 'SET_SELECTED_QUARTER':
+
+    case "APPROVE_DATA":
       return {
         ...state,
-        selectedQuarter: action.payload
+        data: {
+          ...state.data,
+          [action.payload.year]: {
+            ...state.data[action.payload.year],
+            [action.payload.quarter]: {
+              ...state.data[action.payload.year]?.[action.payload.quarter],
+              [action.payload.mode]: {
+                ...state.data[action.payload.year]?.[action.payload.quarter]?.[
+                  action.payload.mode
+                ],
+                status: "approved",
+                approvedBy: action.payload.approvedBy,
+                approvedAt: new Date(),
+              },
+            },
+          },
+        },
       };
+
+    case "REJECT_DATA":
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          [action.payload.year]: {
+            ...state.data[action.payload.year],
+            [action.payload.quarter]: {
+              ...state.data[action.payload.year]?.[action.payload.quarter],
+              [action.payload.mode]: {
+                ...state.data[action.payload.year]?.[action.payload.quarter]?.[
+                  action.payload.mode
+                ],
+                status: "finalized",
+                approvedBy: action.payload.approvedBy,
+                approvedAt: new Date(),
+              },
+            },
+          },
+        },
+      };
+
+    case "FINALIZE_DATA": {
+      const quarterData =
+        state.data[action.payload.year]?.[action.payload.quarter];
+      const updatedQuarterData = Object.entries(quarterData).reduce(
+        (acc, [mode, data]) => ({
+          ...acc,
+          [mode]: {
+            ...data,
+            status: "finalized",
+          },
+        }),
+        {}
+      );
+
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          [action.payload.year]: {
+            ...state.data[action.payload.year],
+            [action.payload.quarter]: updatedQuarterData,
+          },
+        },
+      };
+    }
+
+    case "SET_SELECTED_YEAR":
+      return {
+        ...state,
+        selectedYear: action.payload,
+      };
+
+    case "SET_SELECTED_QUARTER":
+      return {
+        ...state,
+        selectedQuarter: action.payload,
+      };
+
+    case "SET_COMPANY_NAME":
+      return {
+        ...state,
+        companyName: action.payload,
+      };
+
+    case "UPDATE_DESCRIPTION":
+      return {
+        ...state,
+        descriptions: {
+          ...state.descriptions,
+          [action.payload.mode]: action.payload.description,
+        },
+      };
+
     default:
       return state;
   }
 }
 
-const CommutingContext = createContext<{
-  state: CommutingState;
-  dispatch: React.Dispatch<Action>;
-} | undefined>(undefined);
+const CommutingContext = createContext<
+  | {
+      state: CommutingState;
+      dispatch: React.Dispatch<Action>;
+    }
+  | undefined
+>(undefined);
 
 export function CommutingProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(commutingReducer, initialState);
@@ -115,7 +407,7 @@ export function CommutingProvider({ children }: { children: ReactNode }) {
 export function useCommuting() {
   const context = useContext(CommutingContext);
   if (context === undefined) {
-    throw new Error('useCommuting must be used within a CommutingProvider');
+    throw new Error("useCommuting must be used within a CommutingProvider");
   }
   return context;
 }
