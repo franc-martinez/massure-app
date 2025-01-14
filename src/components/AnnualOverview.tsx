@@ -137,7 +137,7 @@ export function AnnualOverview() {
             <CardContent>
               <ResponsiveContainer width="100%" height={400}>
                 <BarChart data={percentageData}>
-                  <XAxis dataKey="category" />
+                  <XAxis dataKey="category" height={70} fontSize={14} angle={-32} textAnchor="end" />
                   <YAxis tickFormatter={(value) => `${value}%`} />
                   <Tooltip formatter={(value) => `${(+value).toFixed(2)}%`} />
                   <Legend />
@@ -231,7 +231,7 @@ export function AnnualOverview() {
             <CardContent>
               <ResponsiveContainer width="100%" height={400}>
                 <BarChart data={comparisonData}>
-                  <XAxis dataKey="category" />
+                  <XAxis dataKey="category" height={70} fontSize={14} angle={-32} textAnchor="end" />
                   <YAxis />
                   <Tooltip />
                   <Legend />

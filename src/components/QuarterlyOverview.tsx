@@ -95,7 +95,8 @@ export function QuarterlyOverview() {
             <div className="grid md:grid-cols-2 gap-6">
               <ResponsiveContainer width="100%" height={400}>
                 <BarChart data={emissionsData}>
-                  <XAxis dataKey="name" />
+                  <XAxis dataKey="name" height={80} fontSize={14} angle={-32} textAnchor="end" />
+
                   <YAxis />
                   <Tooltip />
                   <Bar dataKey="value" name="name" fill="#196b24" />
