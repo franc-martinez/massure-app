@@ -12,7 +12,7 @@ export interface EntryData {
 }
 
 export interface QuarterData {
-  [mode: string]: EntryData;
+  [mode: string]: (EntryData | undefined);
 }
 
 export interface YearData {
@@ -138,7 +138,7 @@ function commutingReducer(
                 status: "approved",
                 approvedBy: action.payload.approvedBy,
                 approvedAt: new Date(),
-              },
+              } as EntryData,
             },
           },
         },
@@ -159,7 +159,7 @@ function commutingReducer(
                 ],
                 status: "draft",
                 approvedAt: new Date(),
-              },
+              } as EntryData
             },
           },
         },
@@ -174,14 +174,7 @@ function commutingReducer(
             ...state.data[action.payload.year],
             [action.payload.quarter]: {
               ...state.data[action.payload.year]?.[action.payload.quarter],
-              [action.payload.mode]: {
-                ...state.data[action.payload.year]?.[action.payload.quarter]?.[
-                  action.payload.mode
-                ],
-                status: "finalized",
-                approvedBy: action.payload.approvedBy,
-                approvedAt: new Date(),
-              },
+              [action.payload.mode]: undefined
             },
           },
         },

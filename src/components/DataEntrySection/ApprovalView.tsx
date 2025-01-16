@@ -35,6 +35,18 @@ export function ApprovalView() {
     });
   };
 
+  const handleReject = (mode: string) => {
+    dispatch({
+      type: 'REJECT_DATA',
+      payload: {
+        year: state.selectedYear,
+        quarter: state.selectedQuarter,
+        mode,
+        approvedBy: 'Current User'
+      }
+    });
+  };
+
   const handleUndo = (mode: string) => {
     dispatch({
       type: 'UNDO_DATA',
@@ -104,6 +116,7 @@ export function ApprovalView() {
                           size="sm"
                           variant="outline"
                           className="w-8 h-8 p-0"
+                          onClick={() => handleReject(mode)}
                         >
                           <X className="h-4 w-4 text-red-600" />
                         </Button>
