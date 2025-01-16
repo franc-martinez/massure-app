@@ -1,5 +1,5 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
-import { QuarterlyOverview } from "./components/QuarterlyOverview";
+import { QuarterlyOverview } from "./components/QuarterOverview";
 import { AnnualOverview } from "./components/AnnualOverview";
 import { ReportDownload } from "./components/ReportDownload";
 import { CommutingProvider } from "./context/CommutingContext";

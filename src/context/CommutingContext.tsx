@@ -1,3 +1,4 @@
+import { INITIAL_EMISSIONS_DATA } from "@/constants/emissions";
 import React, { createContext, useContext, useReducer, ReactNode } from "react";
 
 type DataStatus = "draft" | "pending" | "approved" | "finalized";
@@ -53,6 +54,14 @@ type Action =
       };
     }
   | {
+      type: "UNDO_DATA";
+      payload: {
+        year: string;
+        quarter: string;
+        mode: string;
+      };
+    }
+  | {
       type: "REJECT_DATA";
       payload: {
         year: string;
@@ -73,178 +82,7 @@ type Action =
 const currentYear = new Date().getFullYear().toString();
 
 const initialState: CommutingState = {
-  data: {
-    2024: {
-      Q1: {
-        publicTransportMix: {
-          value: 2111,
-          status: "approved",
-          lastModified: new Date(),
-        },
-        cyclingAndWorking: {
-          value: 2000,
-          status: "approved",
-          lastModified: new Date(),
-        },
-        passengerCar: {
-          value: 1000,
-          status: "approved",
-          lastModified: new Date(),
-        },
-        gasolineCar: {
-          value: 650,
-          status: "approved",
-          lastModified: new Date(),
-        },
-        dieselCar: {
-          value: 52,
-          status: "approved",
-          lastModified: new Date(),
-        },
-        hybridCar: {
-          value: 45,
-          status: "approved",
-          lastModified: new Date(),
-        },
-        electricCar: {
-          value: 122,
-          status: "approved",
-          lastModified: new Date(),
-        },
-        airplaneEurope: {
-          value: 2000,
-          status: "approved",
-          lastModified: new Date(),
-        },
-      },
-      Q2: {
-        publicTransportMix: {
-          value: 4000,
-          status: "approved",
-          lastModified: new Date(),
-        },
-        cyclingAndWorking: {
-          value: 3500,
-          status: "approved",
-          lastModified: new Date(),
-        },
-        passengerCar: {
-          value: 1500,
-          status: "approved",
-          lastModified: new Date(),
-        },
-        gasolineCar: {
-          value: 500,
-          status: "approved",
-          lastModified: new Date(),
-        },
-        dieselCar: {
-          value: 400,
-          status: "approved",
-          lastModified: new Date(),
-        },
-        hybridCar: {
-          value: 200,
-          status: "approved",
-          lastModified: new Date(),
-        },
-        electricCar: {
-          value: 535,
-          status: "approved",
-          lastModified: new Date(),
-        },
-        airplaneEurope: {
-          value: 1500,
-          status: "approved",
-          lastModified: new Date(),
-        },
-      },
-      Q3: {
-        publicTransportMix: {
-          value: 3500,
-          status: "approved",
-          lastModified: new Date(),
-        },
-        cyclingAndWorking: {
-          value: 2500,
-          status: "approved",
-          lastModified: new Date(),
-        },
-        passengerCar: {
-          value: 1899,
-          status: "approved",
-          lastModified: new Date(),
-        },
-        gasolineCar: {
-          value: 600,
-          status: "approved",
-          lastModified: new Date(),
-        },
-        dieselCar: {
-          value: 500,
-          status: "approved",
-          lastModified: new Date(),
-        },
-        hybridCar: {
-          value: 650,
-          status: "approved",
-          lastModified: new Date(),
-        },
-        electricCar: {
-          value: 555,
-          status: "approved",
-          lastModified: new Date(),
-        },
-        airplaneEurope: {
-          value: 1700,
-          status: "approved",
-          lastModified: new Date(),
-        },
-      },
-      Q4: {
-        publicTransportMix: {
-          value: 2500,
-          status: "approved",
-          lastModified: new Date(),
-        },
-        cyclingAndWorking: {
-          value: 1000,
-          status: "approved",
-          lastModified: new Date(),
-        },
-        passengerCar: {
-          value: 1556,
-          status: "approved",
-          lastModified: new Date(),
-        },
-        gasolineCar: {
-          value: 670,
-          status: "approved",
-          lastModified: new Date(),
-        },
-        dieselCar: {
-          value: 515,
-          status: "approved",
-          lastModified: new Date(),
-        },
-        hybridCar: {
-          value: 789,
-          status: "approved",
-          lastModified: new Date(),
-        },
-        electricCar: {
-          value: 650,
-          status: "approved",
-          lastModified: new Date(),
-        },
-        airplaneEurope: {
-          value: 2100,
-          status: "approved",
-          lastModified: new Date(),
-        },
-      },
-    },
-  },
+  data: INITIAL_EMISSIONS_DATA as CommutingData,
   selectedYear: currentYear,
   selectedQuarter: "Q1",
   companyName: "TrackJack Europe B.V.",
@@ -299,6 +137,27 @@ function commutingReducer(
                 ],
                 status: "approved",
                 approvedBy: action.payload.approvedBy,
+                approvedAt: new Date(),
+              },
+            },
+          },
+        },
+      };
+
+    case "UNDO_DATA":
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          [action.payload.year]: {
+            ...state.data[action.payload.year],
+            [action.payload.quarter]: {
+              ...state.data[action.payload.year]?.[action.payload.quarter],
+              [action.payload.mode]: {
+                ...state.data[action.payload.year]?.[action.payload.quarter]?.[
+                  action.payload.mode
+                ],
+                status: "draft",
                 approvedAt: new Date(),
               },
             },
