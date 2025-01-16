@@ -24,10 +24,10 @@ export function AnnualOverview() {
         let value = 0;
         if (
           data[selectedYear]?.[quarter]?.[mode as TransportMode] &&
-          data[selectedYear]?.[quarter]?.[mode as TransportMode].status ===
+          data[selectedYear]?.[quarter]?.[mode as TransportMode]?.status ===
             "approved"
         ) {
-          value = data[selectedYear]?.[quarter]?.[mode as TransportMode].value;
+          value = data[selectedYear]?.[quarter]?.[mode as TransportMode]?.value || 0;
         }
         acc[mode as TransportMode] = calculateEmissions(
           mode as TransportMode,

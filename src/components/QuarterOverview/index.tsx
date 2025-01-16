@@ -40,11 +40,11 @@ export function QuarterlyOverview() {
 
       if (
         data[selectedYear]?.[selectedQuarter]?.[key as TransportMode] &&
-        data[selectedYear]?.[selectedQuarter]?.[key as TransportMode].status ===
+        data[selectedYear]?.[selectedQuarter]?.[key as TransportMode]?.status ===
           "approved"
       ) {
         value =
-          data[selectedYear]?.[selectedQuarter]?.[key as TransportMode].value;
+          data[selectedYear]?.[selectedQuarter]?.[key as TransportMode]?.value || 0;
       }
 
       return {
