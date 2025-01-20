@@ -113,6 +113,17 @@ export function DataEntryForm() {
     form.setValue(mode, e.target.value);
   };
 
+  const handleSaveAll = () => {
+    const formValues = form.getValues();
+    Object.entries(formValues).forEach(([mode, value]) => {
+      handleSubmit(mode as TransportMode, value);
+    });
+    toast({
+      title: "All Data Saved as Draft",
+      description: `All transport mode data has been saved as draft for ${state.selectedQuarter} ${state.selectedYear}.`,
+    });
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -131,6 +142,12 @@ export function DataEntryForm() {
       <CardContent>
         <Form {...form}>
           <div className="space-y-8">
+            <div className="flex justify-end mt-6 border-t pt-4">
+              <Button type="button" size="lg" onClick={handleSaveAll}>
+                Save All as Draft
+              </Button>
+            </div>
+
             {(Object.keys(EMISSION_FACTORS) as TransportMode[]).map((mode) => {
               const entryData = currentData[mode] as EntryData | undefined;
               const metadata = TRANSPORT_METADATA[mode];
