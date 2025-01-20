@@ -4,7 +4,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "../ui/card"
+} from "../ui/card";
 import {
   Table,
   TableBody,
@@ -12,49 +12,80 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "../ui/table"
-import { Button } from "../ui/button"
-import { EntryData, useCommuting } from '../../context/CommutingContext'
-import { EMISSION_FACTORS, TransportMode } from '../../constants/emissions'
-import { Check, X, Undo } from 'lucide-react'
-import { cn } from "@/lib/utils"
+} from "../ui/table";
+import { Button } from "../ui/button";
+import { EntryData, useCommuting } from "../../context/CommutingContext";
+import { EMISSION_FACTORS, TransportMode } from "../../constants/emissions";
+import { Check, X, Undo } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { toast } from "@/hooks/use-toast";
 
 export function ApprovalView() {
   const { state, dispatch } = useCommuting();
-  const currentData = state.data[state.selectedYear]?.[state.selectedQuarter] || {};
+  const currentData =
+    state.data[state.selectedYear]?.[state.selectedQuarter] || {};
 
   const handleApprove = (mode: string) => {
     dispatch({
-      type: 'APPROVE_DATA',
+      type: "APPROVE_DATA",
       payload: {
         year: state.selectedYear,
         quarter: state.selectedQuarter,
         mode,
-        approvedBy: 'Current User'
-      }
+        approvedBy: "Current User",
+      },
+    });
+    toast({
+      title: "Data Approved",
+      description: `${mode
+        .replace(/([A-Z])/g, " $1")
+        .replace(/^./, (str) =>
+          str.toUpperCase()
+        )} data has been approved for ${state.selectedQuarter} ${
+        state.selectedYear
+      }.`,
     });
   };
 
   const handleReject = (mode: string) => {
     dispatch({
-      type: 'REJECT_DATA',
+      type: "REJECT_DATA",
       payload: {
         year: state.selectedYear,
         quarter: state.selectedQuarter,
         mode,
-        approvedBy: 'Current User'
-      }
+        approvedBy: "Current User",
+      },
+    });
+    toast({
+      title: "Data Rejected",
+      description: `${mode
+        .replace(/([A-Z])/g, " $1")
+        .replace(/^./, (str) =>
+          str.toUpperCase()
+        )} data has been rejected for ${state.selectedQuarter} ${
+        state.selectedYear
+      }.`,
+      variant: "destructive",
     });
   };
 
   const handleUndo = (mode: string) => {
     dispatch({
-      type: 'UNDO_DATA',
+      type: "UNDO_DATA",
       payload: {
         year: state.selectedYear,
         quarter: state.selectedQuarter,
         mode,
-      }
+      },
+    });
+    toast({
+      title: "Approval Undone",
+      description: `Approval for ${mode
+        .replace(/([A-Z])/g, " $1")
+        .replace(/^./, (str) => str.toUpperCase())} data has been undone for ${
+        state.selectedQuarter
+      } ${state.selectedYear}.`,
     });
   };
 
@@ -63,7 +94,8 @@ export function ApprovalView() {
       <CardHeader>
         <CardTitle>Approve Data Entries</CardTitle>
         <CardDescription>
-          Review and approve draft entries for {state.selectedQuarter} {state.selectedYear}
+          Review and approve draft entries for {state.selectedQuarter}{" "}
+          {state.selectedYear}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -81,28 +113,39 @@ export function ApprovalView() {
           <TableBody>
             {(Object.keys(EMISSION_FACTORS) as TransportMode[]).map((mode) => {
               const entryData = currentData[mode] as EntryData;
-              if (!entryData || entryData.status === 'finalized') return null;
+              if (!entryData || entryData.status === "finalized") return null;
 
               return (
                 <TableRow key={mode}>
-                  <TableCell>{mode.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</TableCell>
+                  <TableCell>
+                    {mode
+                      .replace(/([A-Z])/g, " $1")
+                      .replace(/^./, (str) => str.toUpperCase())}
+                  </TableCell>
                   <TableCell>{entryData.value}</TableCell>
                   <TableCell>{EMISSION_FACTORS[mode].unit}</TableCell>
                   <TableCell>
-                    <span className={cn(
-                      "text-xs px-2 py-0.5 rounded-full capitalize",
-                      {
-                        "bg-yellow-100 text-yellow-800": entryData.status === 'draft',
-                        "bg-blue-100 text-blue-800": entryData.status === 'pending',
-                        "bg-green-100 text-green-800": entryData.status === 'approved'
-                      }
-                    )}>
+                    <span
+                      className={cn(
+                        "text-xs px-2 py-0.5 rounded-full capitalize",
+                        {
+                          "bg-yellow-100 text-yellow-800":
+                            entryData.status === "draft",
+                          "bg-blue-100 text-blue-800":
+                            entryData.status === "pending",
+                          "bg-green-100 text-green-800":
+                            entryData.status === "approved",
+                        }
+                      )}
+                    >
                       {entryData.status}
                     </span>
                   </TableCell>
-                  <TableCell>{entryData.lastModified.toLocaleDateString()}</TableCell>
                   <TableCell>
-                    {entryData.status === 'draft' && (
+                    {entryData.lastModified.toLocaleDateString()}
+                  </TableCell>
+                  <TableCell>
+                    {entryData.status === "draft" && (
                       <div className="flex space-x-2">
                         <Button
                           size="sm"
@@ -122,7 +165,7 @@ export function ApprovalView() {
                         </Button>
                       </div>
                     )}
-                    {entryData.status === 'approved' && (
+                    {entryData.status === "approved" && (
                       <div className="flex space-x-2">
                         <Button
                           size="sm"
@@ -142,6 +185,5 @@ export function ApprovalView() {
         </Table>
       </CardContent>
     </Card>
-  )
+  );
 }
-

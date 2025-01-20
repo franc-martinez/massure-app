@@ -37,8 +37,8 @@ const CO2EmissionsTable = ({
             <TableHead className="text-white font-bold">
               CO2 Emissions
             </TableHead>
-            <TableHead className="text-white font-bold">Percentage</TableHead>
             <TableHead className="text-white font-bold">Unit</TableHead>
+            <TableHead className="text-white font-bold">Percentage</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -49,15 +49,15 @@ const CO2EmissionsTable = ({
             >
               <TableCell className="px-2">{row.name}</TableCell>
               <TableCell className="px-2">{row.value}</TableCell>
-              <TableCell className="px-2">{row.percentage}%</TableCell>
               <TableCell className="px-2">kg CO₂</TableCell>
+              <TableCell className="px-2">{row.percentage}%</TableCell>
             </TableRow>
           ))}
           <TableRow>
             <TableCell>Total</TableCell>
             <TableCell>{total}</TableCell>
-            <TableCell>{}</TableCell>
             <TableCell>kg CO2</TableCell>
+            <TableCell></TableCell>
           </TableRow>
         </TableBody>
       </Table>
