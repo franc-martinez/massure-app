@@ -14,7 +14,7 @@ import { loginUser, resetAuth } from "../../redux/actions";
 import { VerticalForm, FormInput, AuthLayout, PageBreadcrumb } from "../../components";
 
 interface UserData {
-  username: string;
+  email: string;
   password: string;
 }
 
@@ -34,11 +34,11 @@ const BottomLink = () => {
 const Login = () => {
   const dispatch = useDispatch<AppDispatch>();
 
-  const { user, userLoggedIn, loading } = useSelector(
+  const { user, userLoggedIn, loading, error } = useSelector(
     (state: RootState) => ({
       user: state.Auth.user,
       loading: state.Auth.loading,
-      error: state.Auth.error,
+      error: state.Auth.loginError,
       userLoggedIn: state.Auth.userLoggedIn,
     })
   );
@@ -52,7 +52,10 @@ const Login = () => {
   */
   const schemaResolver = yupResolver(
     yup.object().shape({
-      username: yup.string().required("Please enter Username"),
+      email: yup
+        .string()
+        .required("Please enter Email")
+        .email("Please enter valid Email"),
       password: yup.string().required("Please enter Password"),
     })
   );
@@ -61,7 +64,7 @@ const Login = () => {
   handle form submissionnewTask
   */
   const onSubmit = (formData: UserData) => {
-    dispatch(loginUser(formData["username"], formData["password"]));
+    dispatch(loginUser(formData["email"], formData["password"]));
   };
 
   const location = useLocation();
@@ -77,17 +80,19 @@ const Login = () => {
         authTitle="Sign In"
         helpText="Enter your email address and password to access admin panel."
         bottomLinks={<BottomLink />}
-        hasThirdPartyLogin
       >
+         {error && 
+          <div className='text-red-500 bg-red-100 rounded px-2 py-1 mb-3'>{error}</div>
+        }
         <VerticalForm<UserData>
           onSubmit={onSubmit}
           resolver={schemaResolver}
-          defaultValues={{ username: "", password: "" }}
+          defaultValues={{ email: "", password: "" }}
         >
           <FormInput
             label="Email Address"
-            type="text"
-            name="username"
+            type="email"
+            name="email"
             placeholder="Enter your email"
             containerClass="mb-4"
             className="form-input"

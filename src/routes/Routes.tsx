@@ -1,8 +1,14 @@
-import React from "react";
-import { Navigate, Route, RouteObject, RouteProps, Routes } from "react-router-dom";
+import React, { useEffect } from "react";
+import {
+  Navigate,
+  Route,
+  RouteObject,
+  RouteProps,
+  Routes,
+} from "react-router-dom";
 
 // redux
-import { RootState } from "../redux/store";
+import { AppDispatch, RootState } from "../redux/store";
 import { useSelector } from "react-redux";
 
 // All layouts containers
@@ -10,52 +16,61 @@ import DefaultLayout from "../layouts/Default";
 import VerticalLayout from "../layouts/Vertical";
 
 import { authProtectedFlattenRoutes, publicProtectedFlattenRoutes } from ".";
-import { APICore } from "../helpers/api/apiCore";
+import PrivateRoute from "./PrivateRoute";
+import { useDispatch } from "react-redux";
+import { getAccount } from "@/redux/actions";
 
 const AllRoutes = (props: RouteProps) => {
-  const { Layout } = useSelector((state: RootState) => ({
-    Layout: state.Layout,
-  }));
+  const dispatch = useDispatch<AppDispatch>();
 
-  const api = new APICore();
+  const { token, Layout } = useSelector(
+    (state: RootState) => ({
+      token: state.Auth.token,
+      Layout: state.Layout,
+    })
+  );
+
+  useEffect(() => {
+    const accessToken = token
+    if (accessToken) {
+      dispatch(getAccount())
+    }
+  }, [token])
 
   return (
     <React.Fragment>
       <Routes>
         <Route>
-          {(publicProtectedFlattenRoutes || []).map((route: RouteObject, idx: number) => (
-            <Route
-              path={route.path}
-              element={
-                <DefaultLayout {...props} layout={Layout}>
-                  {route.element}
-                </DefaultLayout>
-              }
-              key={idx}
-            />
-          ))}
+          {(publicProtectedFlattenRoutes || []).map(
+            (route: RouteObject, idx: number) => (
+              <Route
+                path={route.path}
+                element={
+                  <DefaultLayout {...props} layout={Layout}>
+                    {route.element}
+                  </DefaultLayout>
+                }
+                key={idx}
+              />
+            )
+          )}
           ;
         </Route>
 
         <Route>
-          {(authProtectedFlattenRoutes || []).map((route: RouteObject, idx: number) => (
-            <Route
-              path={route.path}
-              element={
-                api.isUserAuthenticated() === false ? (
-                  <Navigate
-                    to={{
-                      pathname: "/auth/login",
-                      search: "next=" + route.path,
-                    }}
-                  />
-                ) : (
-                  <VerticalLayout {...props}>{route.element}</VerticalLayout>
-                )
-              }
-              key={idx}
-            />
-          ))}
+          {(authProtectedFlattenRoutes || []).map(
+            (route: RouteObject, idx: number) => (
+              <Route
+                path={route.path}
+                element={
+                  <PrivateRoute path={route.path}>
+                    <VerticalLayout {...props}>{route.element}</VerticalLayout>
+                  </PrivateRoute>
+                }
+                key={idx}
+              />
+            )
+          )}
           ;
         </Route>
       </Routes>

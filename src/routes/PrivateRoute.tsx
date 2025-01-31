@@ -1,44 +1,26 @@
-import { Route, Navigate, RouteProps } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
-// helpers
-import { APICore } from "../helpers/api/apiCore";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 
-/**
- * Private Route forces the authorization before the route can be accessed
- * @param {*} param0
- * @returns
- */
+const PrivateRoute = ({ children, roles, path }: any) => {
+  const { isUserLoggedIn, token } = useSelector((state: RootState) => ({
+    token: state.Auth.token,
+    isUserLoggedIn: state.Auth.isUserLoggedIn,
+  }));
 
-const PrivateRoute = ({ component: Component, roles, ...rest }: any) => {
-  const api = new APICore();
+  if (!token || (isUserLoggedIn !== undefined && !isUserLoggedIn)) {
+    return (
+      <Navigate
+        to={{
+          pathname: "/auth/login",
+          search: "next=" + path,
+        }}
+      />
+    );
+  }
 
-  return (
-    <Route
-      {...rest}
-      render={(props: RouteProps) => {
-        if (api.isUserAuthenticated() === false) {
-          // not logged in so redirect to login page with the return url
-          return (
-            <Navigate
-              to={{
-                pathname: "/auth/login",
-              }}
-            />
-          );
-        }
-
-        const loggedInUser = api.getLoggedInUser();
-
-        // check if route is restricted by role
-        if (roles && roles.indexOf(loggedInUser.role) === -1) {
-          // role not authorised so redirect to login page
-          return <Navigate to={{ pathname: "/" }} />;
-        }
-        // authorised so return component
-        return <Component {...props} />;
-      }}
-    />
-  );
+  return <>{children}</>;
 };
 
 export default PrivateRoute;

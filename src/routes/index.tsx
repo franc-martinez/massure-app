@@ -1,11 +1,11 @@
 import React from "react";
-import { Navigate, Route, RouteProps } from "react-router-dom";
+import { Navigate, RouteProps } from "react-router-dom";
 
-// components
-import PrivateRoute from "./PrivateRoute";
 
 // auth
 const Login = React.lazy(() => import("../pages/auth/Login"));
+const Register = React.lazy(() => import("../pages/auth/Register"));
+const RecoverPassword = React.lazy(() => import("../pages/auth/RecoverPassword"));
 
 // dashboard 
 const Dashboard = React.lazy(() => import("../pages/dashboard/"));
@@ -34,20 +34,17 @@ const dashboardRoutes: RoutesProps = {
     {
       path: "/",
       name: "Root",
-      element: <Navigate to="/dashboard" />,
-      route: PrivateRoute,
+      element: <Navigate to="/dashboard" />
     },
     {
       path: "/dashboard",
       name: "Dashboard",
-      element: <Dashboard />,
-      route: PrivateRoute,
+      element: <Dashboard />
     },
     {
       path: "/gauges",
       name: "Gauges",
-      element: <Gauges />,
-      route: PrivateRoute,
+      element: <Gauges />
     },
   ],
 };
@@ -57,8 +54,17 @@ const authRoutes: RoutesProps[] = [
   {
     path: "/auth/login",
     name: "Login",
-    element: <Login />,
-    route: Route,
+    element: <Login />
+  },
+  {
+    path: "/auth/register",
+    name: "Register",
+    element: <Register />
+  },
+  {
+    path: "/auth/recover-password",
+    name: "Recover Password",
+    element: <RecoverPassword />
   },
 ];
 

@@ -1,11 +1,22 @@
+import { UserData } from "@/pages/auth/Register";
 import { APICore } from "./apiCore";
 
 const api = new APICore();
 
-// account
-function login(params: { username: string; password: string }) {
-  const baseUrl = "/login/";
-  return api.create(`${baseUrl}`, params);
+function login(params: { email: string; password: string }) {
+  return api.create('/login', params);
 }
 
-export { login };
+function signup(params: UserData) {
+  return api.create('/register', params);
+}
+
+function getAccount() {
+  return api.get('/me');
+}
+
+function logout() {
+  return api.create('/logout');
+}
+
+export { login, signup, getAccount, logout };

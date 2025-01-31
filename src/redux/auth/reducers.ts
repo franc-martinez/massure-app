@@ -1,30 +1,24 @@
-// apicore
-import { APICore } from "../../helpers/api/apiCore";
-
-// constants
+import { getAccessTokenFromStorage } from "@/helpers/api/apiCore";
 import { AuthActionTypes } from "./constants";
 
-const api = new APICore();
-
 const INIT_STATE = {
-  user: api.getLoggedInUser(),
   loading: false,
+  token: getAccessTokenFromStorage()
 };
 
 interface UserData {
   id: number;
-  username: string;
-  password: string;
-  firstName: string;
-  lastName: string;
-  role: string;
-  token: string;
+  name: string;
+  email: string;
+  phone: string;
 }
 
 interface State {
-  user?: UserData | {};
-  loading?: boolean;
-  value?: boolean;
+  user?: UserData;
+  token?: string;
+  loading: boolean;
+  error?: string;
+  isUserLoggedIn?: boolean;
 }
 
 const Auth = (state: State = INIT_STATE, action: any): any => {
@@ -34,8 +28,7 @@ const Auth = (state: State = INIT_STATE, action: any): any => {
         case AuthActionTypes.LOGIN_USER: {
           return {
             ...state,
-            user: action.payload.data,
-            userLoggedIn: true,
+            token: action.payload.data,
             loading: false,
           };
         }
@@ -43,23 +36,23 @@ const Auth = (state: State = INIT_STATE, action: any): any => {
           return {
             ...state,
             loading: false,
-            userSignUp: true,
           };
         }
         case AuthActionTypes.LOGOUT_USER: {
           return {
             ...state,
-            user: null,
+            isUserLoggedIn: false,
+            user: undefined,
+            token: undefined,
             loading: false,
-            userLogout: true,
           };
         }
-        case AuthActionTypes.FORGOT_PASSWORD: {
+        case AuthActionTypes.GET_ACCOUNT: {
           return {
             ...state,
-            resetPasswordSuccess: action.payload.data,
+            user: action.payload.data,
+            isUserLoggedIn: true,
             loading: false,
-            passwordReset: true,
           };
         }
         default:
@@ -71,8 +64,8 @@ const Auth = (state: State = INIT_STATE, action: any): any => {
         case AuthActionTypes.LOGIN_USER: {
           return {
             ...state,
-            error: action.payload.error,
-            userLoggedIn: false,
+            loginError: action.payload.error,
+            token: undefined,
             loading: false,
           };
         }
@@ -80,16 +73,24 @@ const Auth = (state: State = INIT_STATE, action: any): any => {
           return {
             ...state,
             registerError: action.payload.error,
-            userSignUp: false,
             loading: false,
           };
         }
-        case AuthActionTypes.FORGOT_PASSWORD: {
+        case AuthActionTypes.GET_ACCOUNT: {
           return {
             ...state,
-            error: action.payload.error,
+            user: null,
             loading: false,
-            passwordReset: false,
+            isUserLoggedIn: false,
+          };
+        }
+        case AuthActionTypes.LOGOUT_USER: {
+          return {
+            ...state,
+            isUserLoggedIn: false,
+            user: undefined,
+            token: undefined,
+            loading: false,
           };
         }
         default:
@@ -97,19 +98,16 @@ const Auth = (state: State = INIT_STATE, action: any): any => {
       }
 
     case AuthActionTypes.LOGIN_USER:
-      return { ...state, loading: true, userLoggedIn: false };
+      return { ...state, loading: true };
+    case AuthActionTypes.LOGIN_USER:
+      return { ...state, loading: true };
     case AuthActionTypes.LOGOUT_USER:
-      return { ...state, loading: true, userLogout: false };
+      return { ...state, loading: true };
+    case AuthActionTypes.GET_ACCOUNT:
+      return { ...state, loading: true };
     case AuthActionTypes.RESET:
       return {
-        ...state,
         loading: false,
-        error: false,
-        userSignUp: false,
-        userLoggedIn: false,
-        passwordReset: false,
-        passwordChange: false,
-        resetPasswordSuccess: null,
       };
     default:
       return { ...state };

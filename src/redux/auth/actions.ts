@@ -1,30 +1,25 @@
-// constants
 import { AuthActionTypes } from "./constants";
 
 export interface AuthActionType {
   type:
   | AuthActionTypes.API_RESPONSE_SUCCESS
   | AuthActionTypes.API_RESPONSE_ERROR
-  | AuthActionTypes.FORGOT_PASSWORD
-  | AuthActionTypes.FORGOT_PASSWORD_CHANGE
   | AuthActionTypes.LOGIN_USER
   | AuthActionTypes.LOGOUT_USER
   | AuthActionTypes.RESET
-  | AuthActionTypes.SIGNUP_USER;
+  | AuthActionTypes.SIGNUP_USER
+  | AuthActionTypes.GET_ACCOUNT;
   payload: {} | string;
 }
 
 interface UserData {
   id: number;
-  username: string;
-  password: string;
-  firstName: string;
-  lastName: string;
-  role: string;
-  token: string;
+  name: string;
+  phone: string;
+  email: string;
+  avatar: string;
 }
 
-// common success
 export const authApiResponseSuccess = (
   actionType: string,
   data: UserData | {}
@@ -32,7 +27,7 @@ export const authApiResponseSuccess = (
   type: AuthActionTypes.API_RESPONSE_SUCCESS,
   payload: { actionType, data },
 });
-// common error
+
 export const authApiResponseError = (
   actionType: string,
   error: string
@@ -41,9 +36,9 @@ export const authApiResponseError = (
   payload: { actionType, error },
 });
 
-export const loginUser = (username: string, password: string): AuthActionType => ({
+export const loginUser = (email: string, password: string): AuthActionType => ({
   type: AuthActionTypes.LOGIN_USER,
-  payload: { username, password },
+  payload: { email, password },
 });
 
 export const logoutUser = (): AuthActionType => ({
@@ -51,18 +46,14 @@ export const logoutUser = (): AuthActionType => ({
   payload: {},
 });
 
-export const signupUser = (
-  fullname: string,
-  email: string,
-  password: string
-): AuthActionType => ({
-  type: AuthActionTypes.SIGNUP_USER,
-  payload: { fullname, email, password },
+export const getAccount = (): AuthActionType => ({
+  type: AuthActionTypes.GET_ACCOUNT,
+  payload: {},
 });
 
-export const forgotPassword = (username: string): AuthActionType => ({
-  type: AuthActionTypes.FORGOT_PASSWORD,
-  payload: { username },
+export const signupUser = (data: { name: string; email: string; phone?: string; password: string }): AuthActionType => ({
+  type: AuthActionTypes.SIGNUP_USER,
+  payload: data,
 });
 
 export const resetAuth = (): AuthActionType => ({

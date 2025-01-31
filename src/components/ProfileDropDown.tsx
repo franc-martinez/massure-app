@@ -1,12 +1,11 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
 import { ProfileMenuItem } from '../layouts/Topbar';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { PopoverLayout } from './HeadlessUI';
 import { useDispatch } from 'react-redux';
-import { AppDispatch, RootState } from '../redux/store';
+import { AppDispatch } from '../redux/store';
 import { logoutUser, resetAuth } from '../redux/actions';
-import { useSelector } from 'react-redux';
 
 interface ProfileDropDownProps {
   menuItems: Array<ProfileMenuItem>;
@@ -14,17 +13,7 @@ interface ProfileDropDownProps {
 }
 
 const ProfileDropDown = ({ menuItems, profiliePic }: ProfileDropDownProps) => {
-
-  const navigate = useNavigate();
-
   const dispatch = useDispatch<AppDispatch>();
-
-  const { user, userLoggedIn } = useSelector(
-    (state: RootState) => ({
-      user: state.Auth.user,
-      userLoggedIn: state.Auth.userLoggedIn,
-    })
-  );
 
   const PopoverToggler = () => {
     return (
@@ -35,9 +24,6 @@ const ProfileDropDown = ({ menuItems, profiliePic }: ProfileDropDownProps) => {
   const handleLogout = () => {
     dispatch(resetAuth());
     dispatch(logoutUser());
-    if (userLoggedIn || user) {
-      navigate("/auth/login");
-    }
   }
 
   return (

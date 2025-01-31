@@ -1,30 +1,57 @@
-import jwtDecode from "jwt-decode";
 import axios from "axios";
 
 import config from "../../config";
+import { store } from "@/redux/store";
+import { logoutUser, authApiResponseSuccess } from "@/redux/actions";
+import { AuthActionTypes } from "@/redux/auth/constants";
+
 
 // content type
 axios.defaults.headers.post["Content-Type"] = "application/json";
 axios.defaults.baseURL = config.API_URL;
+
+const refreshAccessToken = async () => {
+  try {
+    const refreshToken = sessionStorage.getItem(REFRESH_TOKEN_KEY) as string
+    if (!refreshToken) {
+      throw new Error("No refresh token available.");
+    }
+    const response = await axios.post('/refresh-token', {
+      token: refreshToken,
+    });
+    const tokens = response.data
+    setAuthorization(tokens)
+    store.dispatch(authApiResponseSuccess(AuthActionTypes.LOGIN_USER, tokens.accessToken))
+    return tokens.accessToken
+  } catch (error) {
+    store.dispatch(logoutUser());
+    return null;
+  }
+};
+
 
 // intercepting to capture errors
 axios.interceptors.response.use(
   (response) => {
     return response;
   },
-  (error) => {
-    // Any status codes that falls outside the range of 2xx cause this function to trigger
+  async (error) => {
     let message;
 
-    if (error && error.response && error.response.status === 404) {
-      // window.location.href = '/not-found';
-    } else if (error && error.response && error.response.status === 403) {
-      window.location.href = "/access-denied";
+    if (error && error.response && error.response.status === 401) {
+      if (error.response.config.url !== '/logout') {
+        try {
+          const newAccessToken = await refreshAccessToken();
+          if (!newAccessToken) throw new Error("Refresh failed");
+          error.config.headers["Authorization"] = `Bearer ${newAccessToken}`;
+          return axios.request(error.config);
+        } catch (refreshError) {
+          message = "Session expired, logging out...";
+        }
+      }
+      message = "Session expired, logging out...";
     } else {
       switch (error.response.status) {
-        case 401:
-          message = "Invalid credentials";
-          break;
         case 403:
           message = "Access Forbidden";
           break;
@@ -43,26 +70,34 @@ axios.interceptors.response.use(
   }
 );
 
-const AUTH_SESSION_KEY = "konrix_user";
+const ACCESS_TOKEN_KEY = import.meta.env.VITE_ACCESS_TOKEN_KEY || "access-token";
+const REFRESH_TOKEN_KEY = import.meta.env.VITE_REFRESH_TOKEN_KEY || "refresh-token";
 
 /**
  * Sets the default authorization
  * @param {*} token
  */
-const setAuthorization = (token: string | null) => {
-  if (token) axios.defaults.headers.common["Authorization"] = "JWT " + token;
-  else delete axios.defaults.headers.common["Authorization"];
+const setAuthorization = (tokens: { accessToken: string, refreshToken: string } | null) => {
+  if (tokens) {
+    sessionStorage.setItem(ACCESS_TOKEN_KEY, tokens.accessToken)
+    sessionStorage.setItem(REFRESH_TOKEN_KEY, tokens.refreshToken)
+    axios.defaults.headers.common["Authorization"] = "JWT " + tokens.accessToken
+  } else {
+    sessionStorage.removeItem(ACCESS_TOKEN_KEY)
+    sessionStorage.removeItem(REFRESH_TOKEN_KEY)
+    delete axios.defaults.headers.common["Authorization"];
+  }
 };
 
-const getUserFromCookie = () => {
-  const user = sessionStorage.getItem(AUTH_SESSION_KEY);
-  return user ? (typeof user == "object" ? user : JSON.parse(user)) : null;
+const getAccessTokenFromStorage = () => {
+  return sessionStorage.getItem(ACCESS_TOKEN_KEY) as string
 };
+
 class APICore {
   /**
    * Fetches data from given url
    */
-  get = (url: string, params: any) => {
+  get = (url: string, params?: any) => {
     let response;
     if (params) {
       const queryString = params
@@ -112,7 +147,7 @@ class APICore {
   /**
    * post given data to url
    */
-  create = (url: string, data: any) => {
+  create = (url: string, data?: any) => {
     return axios.post(url, data);
   };
 
@@ -172,57 +207,14 @@ class APICore {
     };
     return axios.patch(url, formData, config);
   };
-
-  isUserAuthenticated = () => {
-    const user = this.getLoggedInUser();
-
-    return true;
-
-    // if (!user) {
-    //   return false;
-    // }
-    // const decoded: any = jwtDecode(user.token);
-    // const currentTime = Date.now() / 1000;
-    // if (decoded.exp < currentTime) {
-    //   console.warn("access token expired");
-    //   return false;
-    // } else {
-    //   return true;
-    // }
-  };
-
-  setLoggedInUser = (session: any) => {
-    if (session)
-      sessionStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(session));
-    else {
-      sessionStorage.removeItem(AUTH_SESSION_KEY);
-    }
-  };
-  /**
-   * Returns the logged in user
-   */
-  getLoggedInUser = () => {
-    return getUserFromCookie();
-  };
-
-  setUserInSession = (modifiedUser: any) => {
-    const userInfo = sessionStorage.getItem(AUTH_SESSION_KEY);
-    if (userInfo) {
-      const { token, user } = JSON.parse(userInfo);
-      this.setLoggedInUser({ token, ...user, ...modifiedUser });
-    }
-  };
 }
 
 /*
 Check if token available in session
 */
-const user = getUserFromCookie();
-if (user) {
-  const { token } = user;
-  if (token) {
-    setAuthorization(token);
-  }
+const accessToken = sessionStorage.getItem(ACCESS_TOKEN_KEY);
+if (accessToken) {
+  axios.defaults.headers.common["Authorization"] = "JWT " + accessToken
 }
 
-export { APICore, setAuthorization };
+export { APICore, setAuthorization, getAccessTokenFromStorage };
